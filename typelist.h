@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace tl {
+namespace type_list {
     struct NullType {
     };
 
@@ -171,24 +171,24 @@ namespace tl {
 
 
 
-    // Remove
+    // RemoveFirst
     template<typename List, typename T>
-    struct Remove {
-        using type = TypeList<typename List::Head, typename Remove<typename List::Tail, T>::type>;
+    struct RemoveFirst {
+        using type = TypeList<typename List::Head, typename RemoveFirst<typename List::Tail, T>::type>;
     };
 
     template<typename T, typename ...O>
-    struct Remove<TypeList<T, O...>, T> {
+    struct RemoveFirst<TypeList<T, O...>, T> {
         using type = typename TypeList<T, O...>::Tail;
     };
 
     template<typename T>
-    struct Remove<EmptyTypeList, T> {
+    struct RemoveFirst<EmptyTypeList, T> {
         using type = EmptyTypeList;
     };
 
     template<typename List, typename T>
-    using Remove_t = typename Remove<List, T>::type;
+    using RemoveFirst_t = typename RemoveFirst<List, T>::type;
 
 
 
@@ -212,6 +212,7 @@ namespace tl {
     using RemoveAll_t = typename RemoveAll<List, T>::type;
 
 
+    // EraseDuplicates
     template<typename List>
     struct EraseDuplicates {
         using type = TypeList<
@@ -230,5 +231,26 @@ namespace tl {
 
     template<typename List>
     using EraseDuplicates_t = typename EraseDuplicates<List>::type;
-}
+
+
+    // ReplaceAll
+    template<typename List, typename T, typename R>
+    struct ReplaceAll {
+        using type = TypeList<typename List::Head, typename ReplaceAll<typename List::Tail, T, R>::type>;
+    };
+
+    template<typename T, typename R, typename ...O>
+    struct ReplaceAll<TypeList<T, O...>, T, R> {
+        using type = TypeList<R, typename ReplaceAll<typename TypeList<T, O...>::Tail, T, R>::type>;
+    };
+
+    template<typename T, typename R>
+    struct ReplaceAll<EmptyTypeList, T, R> {
+        using type = EmptyTypeList;
+    };
+
+    template<typename List, typename T, typename R>
+    using ReplaceAll_t = typename ReplaceAll<List, T, R>::type;
+
+} // namespace type_list
 
