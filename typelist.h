@@ -27,12 +27,6 @@ namespace type_list {
     };
 
 
-//    template<typename H>
-//    struct TypeList<H, EmptyTypeList> {
-//        using Head = H;
-//        using Tail = EmptyTypeList;
-//    };
-
     template<typename H>
     struct TypeList<H> {
         using Head = H;
@@ -56,7 +50,7 @@ namespace type_list {
     };
 
     template<typename List>
-    static const int Length_v = Length<List>::value;
+    static const int LengthV = Length<List>::value;
 
 
     // At
@@ -82,13 +76,13 @@ namespace type_list {
     };
 
     template<typename List, int index>
-    using At_t = typename At<List, index>::type;
+    using AtT = typename At<List, index>::type;
 
 
 
-    // Same
+    // SameLists
     template<typename List1, typename List2>
-    struct Same {
+    struct SameLists {
         static const bool value = []() {
             if (Length<List1>::value != Length<List2>::value) {
                 return false;
@@ -98,27 +92,27 @@ namespace type_list {
                 return false;
             }
 
-            return Same<typename List1::Tail, typename List2::Tail>::value;
+            return SameLists<typename List1::Tail, typename List2::Tail>::value;
         }();
     };
 
     template<>
-    struct Same<EmptyTypeList, EmptyTypeList> {
+    struct SameLists<EmptyTypeList, EmptyTypeList> {
         static const bool value = true;
     };
 
     template<typename List>
-    struct Same<EmptyTypeList, List> {
+    struct SameLists<EmptyTypeList, List> {
         static const bool value = false;
     };
 
     template<typename List>
-    struct Same<List, EmptyTypeList> {
+    struct SameLists<List, EmptyTypeList> {
         static const bool value = false;
     };
 
     template<typename List1, typename List2>
-    const static bool Same_v = Same<List1, List2>::value;
+    const static bool SameListsV = SameLists<List1, List2>::value;
 
 
     // IndexOf
@@ -142,7 +136,7 @@ namespace type_list {
     };
 
     template<typename List, typename T>
-    static const int IndexOf_v = IndexOf<List, T>::value;
+    static const int IndexOfV = IndexOf<List, T>::value;
 
 
     // Add
@@ -167,7 +161,7 @@ namespace type_list {
     };
 
     template<typename List, typename T, int index>
-    using Add_t = typename Add<List, T, index>::type;
+    using AddT = typename Add<List, T, index>::type;
 
 
 
@@ -188,7 +182,7 @@ namespace type_list {
     };
 
     template<typename List, typename T>
-    using RemoveFirst_t = typename RemoveFirst<List, T>::type;
+    using RemoveFirstT = typename RemoveFirst<List, T>::type;
 
 
 
@@ -209,7 +203,7 @@ namespace type_list {
     };
 
     template<typename List, typename T>
-    using RemoveAll_t = typename RemoveAll<List, T>::type;
+    using RemoveAllT = typename RemoveAll<List, T>::type;
 
 
     // EraseDuplicates
@@ -230,7 +224,7 @@ namespace type_list {
     };
 
     template<typename List>
-    using EraseDuplicates_t = typename EraseDuplicates<List>::type;
+    using EraseDuplicatesT = typename EraseDuplicates<List>::type;
 
 
 
@@ -266,7 +260,7 @@ namespace type_list {
     };
 
     template<typename List, typename T, typename R>
-    using ReplaceFirst_t = typename ReplaceFirst<List, T, R>::type;
+    using ReplaceFirstT = typename ReplaceFirst<List, T, R>::type;
 
 
 
@@ -302,7 +296,7 @@ namespace type_list {
     };
 
     template<typename List, typename T, typename R>
-    using ReplaceAll_t = typename ReplaceAll<List, T, R>::type;
+    using ReplaceAllT = typename ReplaceAll<List, T, R>::type;
 
 } // namespace type_list
 

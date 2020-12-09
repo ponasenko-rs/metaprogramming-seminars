@@ -18,7 +18,7 @@ namespace hierarchy {
     };
 
     template<bool condition, typename T, typename U>
-    using Select_t = typename Select<condition, T, U>::type;
+    using SelectT = typename Select<condition, T, U>::type;
 
 
 
@@ -30,7 +30,7 @@ namespace hierarchy {
 
     public:
         using type = typename Select<
-                traits::Convertible_v<typename List::Head, Candidate>,
+                traits::ConvertibleV<typename List::Head, Candidate>,
                 typename List::Head,
                 Candidate
         >::type;
@@ -42,7 +42,7 @@ namespace hierarchy {
     };
 
     template<typename List, typename T>
-    using MostDerived_t = typename MostDerived<List, T>::type;
+    using MostDerivedT = typename MostDerived<List, T>::type;
 
 
     // DerivedToFront
@@ -51,7 +51,7 @@ namespace hierarchy {
     private:
         using MostDerivedInTail = typename MostDerived<typename List::Tail, typename List::Head>::type;
 
-        using Tail = type_list::ReplaceFirst_t<
+        using Tail = type_list::ReplaceFirstT<
                 typename List::Tail,
                 MostDerivedInTail,
                 typename List::Head
@@ -69,7 +69,7 @@ namespace hierarchy {
     };
 
     template<typename List>
-    using DerivedToFront_t = typename DerivedToFront<List>::type;
+    using DerivedToFrontT = typename DerivedToFront<List>::type;
 
 
 
@@ -90,11 +90,10 @@ namespace hierarchy {
     };
 
     template<template<typename> typename Unit>
-    struct GenScatterHierarchy<type_list::NullType, Unit> : {
+    struct GenScatterHierarchy<type_list::NullType, Unit> {
         using Left = NullType;
         using Right = NullType;
     };
-
 
 
     // todo: add LinearHierarchy

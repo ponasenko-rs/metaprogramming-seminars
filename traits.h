@@ -20,7 +20,7 @@ namespace traits {
     };
 
     template<typename T, typename U>
-    static const bool Convertible_v = Convertible<T, U>::value;
+    static const bool ConvertibleV = Convertible<T, U>::value;
 
 
     template<typename T, typename U>
@@ -34,6 +34,6 @@ namespace traits {
     };
 
     template<typename T, typename U>
-    const static bool SameTypes_v = SameTypes<T, U>::value;
+    const static bool SameTypesV = SameTypes<T, U>::value;
 
 } // namespace traits
