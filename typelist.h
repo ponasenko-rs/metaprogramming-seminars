@@ -233,10 +233,62 @@ namespace type_list {
     using EraseDuplicates_t = typename EraseDuplicates<List>::type;
 
 
+
+    // ReplaceFirst
+    template<typename List, typename T, typename R>
+    struct ReplaceFirst {
+        using type = TypeList<typename List::Head, typename ReplaceFirst<typename List::Tail, T, R>::type>;
+    };
+
+    template<typename List, typename T>
+    struct ReplaceFirst<List, T, T> {
+        using type = List;
+    };
+
+    template<typename T, typename ...O>
+    struct ReplaceFirst<TypeList<T, O...>, T, T> {
+        using type = TypeList<T, O...>;
+    };
+
+    template<typename T>
+    struct ReplaceFirst<EmptyTypeList, T, T> {
+        using type = EmptyTypeList;
+    };
+
+    template<typename T, typename R, typename ...O>
+    struct ReplaceFirst<TypeList<T, O...>, T, R> {
+        using type = TypeList<R, O...>;
+    };
+
+    template<typename T, typename R>
+    struct ReplaceFirst<EmptyTypeList, T, R> {
+        using type = EmptyTypeList;
+    };
+
+    template<typename List, typename T, typename R>
+    using ReplaceFirst_t = typename ReplaceFirst<List, T, R>::type;
+
+
+
     // ReplaceAll
     template<typename List, typename T, typename R>
     struct ReplaceAll {
         using type = TypeList<typename List::Head, typename ReplaceAll<typename List::Tail, T, R>::type>;
+    };
+
+    template<typename List, typename T>
+    struct ReplaceAll<List, T, T> {
+        using type = List;
+    };
+
+    template<typename T, typename ...O>
+    struct ReplaceAll<TypeList<T, O...>, T, T> {
+        using type = TypeList<T, O...>;
+    };
+
+    template<typename T>
+    struct ReplaceAll<EmptyTypeList, T, T> {
+        using type = EmptyTypeList;
     };
 
     template<typename T, typename R, typename ...O>

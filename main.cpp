@@ -1,20 +1,23 @@
 #include <iostream>
 #include <type_traits>
 
+#include "hierarchy.h"
 #include "typelist.h"
+#include "traits.h"
+
 
 void testTypeList() {
-    using std::is_same_v;
+    using traits::SameTypes_v;
     namespace tl = type_list;
 
     using List = tl::TypeList<int, float, bool>;
 
 
     // Iterating
-    static_assert(is_same_v<List::Head, int>);
-    static_assert(is_same_v<List::Tail::Head, float>);
-    static_assert(is_same_v<List::Tail::Tail::Head, bool>);
-    static_assert(is_same_v<List::Tail::Tail::Tail, tl::EmptyTypeList>);
+    static_assert(SameTypes_v<List::Head, int>);
+    static_assert(SameTypes_v<List::Tail::Head, float>);
+    static_assert(SameTypes_v<List::Tail::Tail::Head, bool>);
+    static_assert(SameTypes_v<List::Tail::Tail::Tail, tl::EmptyTypeList>);
 
     // Length
     static_assert(tl::Length_v<List> == 3);
@@ -37,11 +40,11 @@ void testTypeList() {
 
 
     // At
-    static_assert(is_same_v<tl::At_t<List, 0>, int>);
-    static_assert(is_same_v<tl::At_t<List, 1>, float>);
-    static_assert(is_same_v<tl::At_t<List, 2>, bool>);
-    static_assert(is_same_v<tl::At_t<List, 3>, tl::NullType>);
-    static_assert(is_same_v<tl::At_t<List, 4>, tl::NullType>);
+    static_assert(SameTypes_v<tl::At_t<List, 0>, int>);
+    static_assert(SameTypes_v<tl::At_t<List, 1>, float>);
+    static_assert(SameTypes_v<tl::At_t<List, 2>, bool>);
+    static_assert(SameTypes_v<tl::At_t<List, 3>, tl::NullType>);
+    static_assert(SameTypes_v<tl::At_t<List, 4>, tl::NullType>);
 
 
     // IndexOf
@@ -116,6 +119,7 @@ void testTypeList() {
             tl::TypeList<int, char, float, double>
     >);
 
+    // todo: add ReplaceFirst tests
 
     // ReplaceAll
     static_assert(tl::Same_v<
@@ -151,8 +155,107 @@ void testTypeList() {
     >);
 }
 
+void testTraits() {
+    class A {
+    };
+    class A1 : public A {
+    };
+    class A2 : public A {
+    };
+    class A11 : public A1 {
+    };
+
+    // Convertible
+    static_assert(traits::Convertible_v<int, int>);
+    static_assert(traits::Convertible_v<int, float>);
+    static_assert(traits::Convertible_v<float, int>);
+
+    static_assert(!traits::Convertible_v<int, type_list::EmptyTypeList>);
+    static_assert(!traits::Convertible_v<type_list::EmptyTypeList, int>);
+
+    static_assert(traits::Convertible_v<A1, A>);
+    static_assert(!traits::Convertible_v<A, A1>);
+    static_assert(traits::Convertible_v<A2, A>);
+    static_assert(!traits::Convertible_v<A2, A1>);
+
+    static_assert(traits::Convertible_v<A11, A>);
+    static_assert(traits::Convertible_v<A11, A1>);
+    static_assert(!traits::Convertible_v<A11, A2>);
+}
+
+
+void testHierarchy() {
+    using traits::SameTypes_v;
+
+    namespace h = hierarchy;
+    namespace tl = type_list;
+
+    class A {
+    };
+    class A1 : public A {
+    };
+    class A2 : public A {
+    };
+    class A11 : public A1 {
+    };
+
+    class B {
+    };
+    class B1 : public B {
+    };
+    class B2 : public B {
+    };
+    class B21 : public B2 {
+    };
+
+    // MostDerived
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A>, A>, A>);
+
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A, A1>, A>, A1>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A1, A>, A>, A1>);
+
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A, A1, A11>, A>, A11>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A1, A11, A>, A>, A11>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A11, A, A1>, A>, A11>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A, A11, A1>, A>, A11>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A1, A, A11>, A>, A11>);
+    static_assert(SameTypes_v<h::MostDerived_t<tl::TypeList<A11, A1, A>, A>, A11>);
+
+
+    // DerivedToFront
+    static_assert(tl::Same_v<
+            h::DerivedToFront_t<tl::TypeList<B>>,
+            tl::TypeList<B>
+    >);
+
+    static_assert(tl::Same_v<
+            h::DerivedToFront_t<tl::TypeList<B, B1>>,
+            tl::TypeList<B1, B>
+    >);
+
+    static_assert(tl::Same_v<
+            h::DerivedToFront_t<tl::TypeList<B1, B>>,
+            tl::TypeList<B1, B>
+    >);
+
+    static_assert(tl::Same_v<
+            h::DerivedToFront_t<tl::TypeList<B, A, A1, B1>>,
+            tl::TypeList<B1, A1, A, B>
+    >);
+
+    static_assert(tl::Same_v<
+            h::DerivedToFront_t<tl::TypeList<B, A1, B2, A, A2, B21, B1>>,
+            tl::TypeList<B1, A1, B21, A2, A, B2, B>
+    >);
+
+    // GenScatterHierarchy
+    // todo: add tests
+}
+
 int main() {
     testTypeList();
+    testTraits();
+    testHierarchy();
 
     return 0;
 }
