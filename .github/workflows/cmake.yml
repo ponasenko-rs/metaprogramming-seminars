@@ -12,11 +12,11 @@ jobs:
       matrix:
         build-type: ["Release", "Debug"]
         config: 
-          - { name: "WindowsMSVC", os: "windows-latest", cc: "cl", ccx: "cl" }
-          - { name: "WindowsMinGW", os: "windows-latest", cc: "gcc", ccx: "g++" }
-          - { name: "UbuntuGcc", os: "ubuntu-latest", cc: "gcc", ccx: "g++" }
-          - { name: "UbuntuClang", os: "ubuntu-latest", cc: "clang", ccx: "clang++" }
-          - { name: "MacOSClang", os: "macos-latest", cc: "clang", ccx: "clang++" }
+          - { name: "WindowsMSVC", os: "windows-latest", cc: "cl", cxx: "cl" }
+          - { name: "WindowsMinGW", os: "windows-latest", cc: "gcc", cxx: "g++" }
+          - { name: "UbuntuGcc", os: "ubuntu-latest", cc: "gcc", cxx: "g++" }
+          - { name: "UbuntuClang", os: "ubuntu-latest", cc: "clang", cxx: "clang++" }
+          - { name: "MacOSClang", os: "macos-latest", cc: "clang", cxx: "clang++" }
     
     env:
       CC: ${{ matrix.config.cc }}
