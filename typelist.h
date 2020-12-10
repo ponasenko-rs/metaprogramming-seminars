@@ -41,16 +41,16 @@ namespace type_list {
     // Length
     template<typename List>
     struct Length {
-        static const int value = 1 + Length<typename List::Tail>::value;
+        static constexpr int value = 1 + Length<typename List::Tail>::value;
     };
 
     template<>
     struct Length<EmptyTypeList> {
-        static const int value = 0;
+        static constexpr int value = 0;
     };
 
     template<typename List>
-    static const int LengthV = Length<List>::value;
+    static constexpr int LengthV = Length<List>::value;
 
 
     // At
@@ -83,7 +83,7 @@ namespace type_list {
     // SameLists
     template<typename List1, typename List2>
     struct SameLists {
-        static const bool value = []() {
+        static constexpr bool value = []() {
             if (Length<List1>::value != Length<List2>::value) {
                 return false;
             }
@@ -98,45 +98,45 @@ namespace type_list {
 
     template<>
     struct SameLists<EmptyTypeList, EmptyTypeList> {
-        static const bool value = true;
+        static constexpr bool value = true;
     };
 
     template<typename List>
     struct SameLists<EmptyTypeList, List> {
-        static const bool value = false;
+        static constexpr bool value = false;
     };
 
     template<typename List>
     struct SameLists<List, EmptyTypeList> {
-        static const bool value = false;
+        static constexpr bool value = false;
     };
 
     template<typename List1, typename List2>
-    const static bool SameListsV = SameLists<List1, List2>::value;
+    static constexpr bool SameListsV = SameLists<List1, List2>::value;
 
 
     // IndexOf
     template<typename List, typename T>
     struct IndexOf {
     private:
-        static const int next_value = IndexOf<typename List::Tail, T>::value;
+        static constexpr int next_value = IndexOf<typename List::Tail, T>::value;
 
     public:
-        static const int value = (next_value == -1) ? -1 : 1 + next_value;
+        static constexpr int value = (next_value == -1) ? -1 : 1 + next_value;
     };
 
     template<typename T, typename ...O>
     struct IndexOf<TypeList<T, O...>, T> {
-        static const int value = 0;
+        static constexpr int value = 0;
     };
 
     template<typename T>
     struct IndexOf<EmptyTypeList, T> {
-        static const int value = -1;
+        static constexpr int value = -1;
     };
 
     template<typename List, typename T>
-    static const int IndexOfV = IndexOf<List, T>::value;
+    static constexpr int IndexOfV = IndexOf<List, T>::value;
 
 
     // Add

@@ -16,24 +16,24 @@ namespace traits {
         static From Mock();
 
     public:
-        const static bool value = sizeof(Test(Mock())) == sizeof(Yes);
+        static constexpr bool value = sizeof(Test(Mock())) == sizeof(Yes);
     };
 
     template<typename T, typename U>
-    static const bool ConvertibleV = Convertible<T, U>::value;
+    static constexpr bool ConvertibleV = Convertible<T, U>::value;
 
 
     template<typename T, typename U>
     struct SameTypes {
-        const static bool value = false;
+        static constexpr bool value = false;
     };
 
     template<typename T>
     struct SameTypes<T, T> {
-        const static bool value = true;
+        static constexpr bool value = true;
     };
 
     template<typename T, typename U>
-    const static bool SameTypesV = SameTypes<T, U>::value;
+    static constexpr bool SameTypesV = SameTypes<T, U>::value;
 
 } // namespace traits

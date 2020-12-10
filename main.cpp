@@ -1,9 +1,8 @@
 #include <iostream>
-#include <type_traits>
 
-#include "hierarchy.h"
 #include "typelist.h"
 #include "traits.h"
+#include "hierarchy.h"
 
 
 void testTypeList() {
