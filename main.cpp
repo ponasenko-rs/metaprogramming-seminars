@@ -256,5 +256,7 @@ int main() {
     testTraits();
     testHierarchy();
 
+    std::cout << "executed" << std::endl;
+
     return 0;
 }
