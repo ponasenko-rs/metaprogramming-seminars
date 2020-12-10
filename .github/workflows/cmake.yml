@@ -33,7 +33,7 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       env:
         OS: ${{ matrix.config.os }}
-        CC: ${ { matrix.config.cc } }
+        CC: ${{ matrix.config.cc }}
         CXX: ${ { matrix.config.cxx } }
         BUILD_TYPE: ${{ matrix.build-type }}
       
