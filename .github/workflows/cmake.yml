@@ -2,19 +2,17 @@ name: CMake
 
 on: [push]
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build:
-    name: ${ { matrix.build-type } }
-    runs-on: ${ { matrix.config.os } }
     strategy:
       fail-fast: false
       matrix:
         build-type: ["Release", "Debug"]
         config: [{name: "UbuntuGcc", os: ubuntu-latest, cc: "gcc", ccx: "g++"}, {name: "UbuntuClang", os: ubuntu-latest, cc: "clang", ccx: "clang++"}]
+        
+    name: ${ { matrix.build-type } }
+    runs-on: ${ { matrix.config.os } }
+    
     steps:
     - uses: actions/checkout@v2
 
