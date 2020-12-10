@@ -4,16 +4,16 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ${ { matrix.config.os } }
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        build-type: ["Release", "Debug", "A"]
+        build-type: ["Release", "Debug"]
         config: 
           - {name: "UbuntuGcc", os: ubuntu-latest, cc: "gcc", ccx: "g++"}
           - {name: "UbuntuClang", os: ubuntu-latest, cc: "clang", ccx: "clang++"}
         
-    name: ${ { matrix.config } }
+    name: ${ {matrix.config.name} }
     
     steps:
     - uses: actions/checkout@v2
@@ -41,6 +41,6 @@ jobs:
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run:
-        set(ENV{CC} ${ { matrix.config.cc } })
-        set(ENV{CXX} ${ { matrix.config.cxx } }) 
+        set(ENV{CC} ${ {matrix.config.cc} })
+        set(ENV{CXX} ${ {matrix.config.cxx} }) 
         cmake --build . --config ${{matrix.config.build-type}}
