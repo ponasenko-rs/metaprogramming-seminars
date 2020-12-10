@@ -13,7 +13,7 @@ jobs:
           - {name: "UbuntuGcc", os: ubuntu-latest, cc: "gcc", ccx: "g++"}
           - {name: "UbuntuClang", os: ubuntu-latest, cc: "clang", ccx: "clang++"}
         
-    name: ${ { matrix.config.name } }
+    name: ${{ matrix.build-type }}
     
     steps:
     - uses: actions/checkout@v2
