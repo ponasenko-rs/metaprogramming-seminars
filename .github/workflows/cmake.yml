@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   build:
+    runs-on: ${ { matrix.config.os } }
     strategy:
       fail-fast: false
       matrix:
@@ -12,8 +13,7 @@ jobs:
           - {name: "UbuntuGcc", os: ubuntu-latest, cc: "gcc", ccx: "g++"}
           - {name: "UbuntuClang", os: ubuntu-latest, cc: "clang", ccx: "clang++"}
         
-    name: ${ { matrix.build-type } }
-    runs-on: ${ { matrix.config.os } }
+    name: ${ { matrix.config } }
     
     steps:
     - uses: actions/checkout@v2
