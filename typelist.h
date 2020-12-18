@@ -53,6 +53,7 @@ namespace type_list {
     static constexpr int LengthV = Length<List>::value;
 
 
+
     // At
     template<typename List, int index>
     struct At {
@@ -115,6 +116,7 @@ namespace type_list {
     static constexpr bool SameListsV = SameLists<List1, List2>::value;
 
 
+
     // IndexOf
     template<typename List, typename T>
     struct IndexOf {
@@ -137,6 +139,7 @@ namespace type_list {
 
     template<typename List, typename T>
     static constexpr int IndexOfV = IndexOf<List, T>::value;
+
 
 
     // Add
@@ -206,6 +209,7 @@ namespace type_list {
     using RemoveAllT = typename RemoveAll<List, T>::type;
 
 
+
     // EraseDuplicates
     template<typename List>
     struct EraseDuplicates {
@@ -217,6 +221,7 @@ namespace type_list {
                 >::type
         >;
     };
+
 
     template<>
     struct EraseDuplicates<EmptyTypeList> {

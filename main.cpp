@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "typelist.h"
 #include "traits.h"
@@ -111,6 +112,10 @@ void testTypeList() {
 
     static_assert(tl::SameListsV<
             tl::EraseDuplicatesT<tl::TypeList<int, int, int>>, tl::TypeList<int>
+    >);
+
+    static_assert(tl::SameListsV<
+            tl::EraseDuplicatesT<tl::TypeList<int, float, double>>, tl::TypeList<int, float, double>
     >);
 
     static_assert(tl::SameListsV<
@@ -325,6 +330,13 @@ void testHierarchy() {
     >);
 
     static_assert(sizeof(ScatterHierarchy) == sizeof(LinearHierarchy));
+    
+    // LinearHierarchyWithTypeCopies
+    h::GenLinearHierarchy<tl::TypeList<int, float, int>, h::SimpleLinearUnit> lh_with_copies;
+    h::LinearHierarchyGet<0>(lh_with_copies).value = 1;
+    h::LinearHierarchyGet<2>(lh_with_copies).value = 2;
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 1);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 2);
 }
 
 int main() {

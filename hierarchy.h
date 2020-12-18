@@ -79,6 +79,9 @@ namespace hierarchy {
     struct GenScatterHierarchy :
             public GenScatterHierarchy<typename List::Tail, Unit>,
             public Unit<typename List::Head> {
+        static_assert(type_list::SameListsV<List, type_list::EraseDuplicatesT<List>>,
+                "in scatter hierarchy all types must be unique");
+
         using LeftBase = Unit<typename List::Head>;
         using RightBase = GenScatterHierarchy<typename List::Tail, Unit>;
     };
