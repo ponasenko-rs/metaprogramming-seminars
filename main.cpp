@@ -118,8 +118,27 @@ void testTypeList() {
             tl::TypeList<int, char, float, double>
     >);
 
-    // todo: add ReplaceFirst tests
+    // ReplaceFirst
+    static_assert(tl::SameListsV<tl::ReplaceFirstT<List, int, double>, tl::TypeList<double, float, bool>>);
+    static_assert(tl::SameListsV<tl::ReplaceFirstT<List, float, double>, tl::TypeList<int, double, bool>>);
+    static_assert(tl::SameListsV<tl::ReplaceFirstT<List, bool, double>, tl::TypeList<int, float, double>>);
+    static_assert(tl::SameListsV<tl::ReplaceFirstT<List, double, char>, tl::TypeList<int, float, bool>>);
 
+    static_assert(tl::SameListsV<tl::ReplaceFirstT<tl::EmptyTypeList, double, char>, tl::EmptyTypeList>);
+    static_assert(tl::SameListsV<
+            tl::ReplaceFirstT<
+                    tl::ReplaceFirstT<
+                            tl::ReplaceFirstT<tl::TypeList<bool, bool, bool>, bool, double>,
+                            bool, double>,
+                    bool, double>,
+            tl::TypeList<double, double, double>
+    >);
+    static_assert(tl::SameListsV<
+            tl::ReplaceFirstT<tl::TypeList<bool, int, bool, double, bool>, bool, double>,
+            tl::TypeList<double, int, bool, double, bool>
+    >);
+    
+    
     // ReplaceAll
     static_assert(tl::SameListsV<
             tl::ReplaceAllT<tl::TypeList<int>, int, float>, tl::TypeList<float>
@@ -248,7 +267,64 @@ void testHierarchy() {
     >);
 
     // GenScatterHierarchy
-    // todo: add tests
+    using HierarchyParams = tl::TypeList<int, float, double>;
+
+    using ScatterHierarchy = h::GenScatterHierarchy<HierarchyParams, h::SimpleScatterUnit>;
+    static_assert(traits::SameTypesV<
+            h::ScatterHierarchyGetTypeT<ScatterHierarchy, 0>,
+            h::SimpleScatterUnit<tl::AtT<HierarchyParams, 0>>
+    >);
+
+    static_assert(traits::SameTypesV<
+            h::ScatterHierarchyGetTypeT<ScatterHierarchy, 1>,
+            h::SimpleScatterUnit<tl::AtT<HierarchyParams, 1>>
+    >);
+
+    static_assert(traits::SameTypesV<
+            h::ScatterHierarchyGetTypeT<ScatterHierarchy, 2>,
+            h::SimpleScatterUnit<tl::AtT<HierarchyParams, 2>>
+    >);
+
+    static_assert(traits::SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 3>, h::NullType>);
+
+    // ScatterHierarchyGet
+    ScatterHierarchy sh_obj;
+    static_assert(traits::SameTypesV<
+            decltype(h::ScatterHierarchyGet<0>(sh_obj).value),
+            tl::AtT<HierarchyParams, 0>
+    >);
+
+    static_assert(traits::SameTypesV<
+            decltype(h::ScatterHierarchyGet<1>(sh_obj).value),
+            tl::AtT<HierarchyParams, 1>
+    >);
+
+    static_assert(traits::SameTypesV<
+            decltype(h::ScatterHierarchyGet<2>(sh_obj).value),
+            tl::AtT<HierarchyParams, 2>
+    >);
+
+    // LinearHierarchyGet
+    using LinearHierarchy = h::GenLinearHierarchy<HierarchyParams, h::SimpleLinearUnit>;
+    static_assert(traits::SameTypesV<h::LinearHierarchyGetTypeT<LinearHierarchy, 3>, h::NullType>);
+    
+    LinearHierarchy lh_obj;
+    static_assert(traits::SameTypesV<
+            decltype(h::LinearHierarchyGet<0>(lh_obj).value),
+            tl::AtT<HierarchyParams, 0>
+    >);
+
+    static_assert(traits::SameTypesV<
+            decltype(h::LinearHierarchyGet<1>(lh_obj).value),
+            tl::AtT<HierarchyParams, 1>
+    >);
+
+    static_assert(traits::SameTypesV<
+            decltype(h::LinearHierarchyGet<2>(lh_obj).value),
+            tl::AtT<HierarchyParams, 2>
+    >);
+
+    static_assert(sizeof(ScatterHierarchy) == sizeof(LinearHierarchy));
 }
 
 int main() {

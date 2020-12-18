@@ -45,6 +45,7 @@ namespace hierarchy {
     using MostDerivedT = typename MostDerived<List, T>::type;
 
 
+
     // DerivedToFront
     template<typename List>
     struct DerivedToFront {
@@ -78,30 +79,113 @@ namespace hierarchy {
     struct GenScatterHierarchy :
             public GenScatterHierarchy<typename List::Tail, Unit>,
             public Unit<typename List::Head> {
-        using Left = Unit<typename List::Head>;
-        using Right = GenScatterHierarchy<typename List::Tail, Unit>;
-    };
-
-    template<typename T, template<typename> typename Unit>
-    struct GenScatterHierarchy<type_list::TypeList<T>, Unit> :
-            public Unit<T> {
-        using Left = Unit<T>;
-        using Right = NullType;
+        using LeftBase = Unit<typename List::Head>;
+        using RightBase = GenScatterHierarchy<typename List::Tail, Unit>;
     };
 
     template<template<typename> typename Unit>
-    struct GenScatterHierarchy<type_list::NullType, Unit> {
-        using Left = NullType;
-        using Right = NullType;
+    struct GenScatterHierarchy<type_list::EmptyTypeList, Unit> {
+        using LeftBase = NullType;
+        using RightBase = NullType;
     };
 
 
-    // todo: add LinearHierarchy
+
+    // ScatterHierarchyGetType
+    template<typename Hierarchy, int index>
+    struct ScatterHierarchyGetType {
+        using type = typename ScatterHierarchyGetType<typename Hierarchy::RightBase, index - 1>::type;
+    };
+
+    template<typename Hierarchy>
+    struct ScatterHierarchyGetType<Hierarchy, 0> {
+        using type = typename Hierarchy::LeftBase;
+    };
+
+    template<int index>
+    struct ScatterHierarchyGetType<NullType, index> {
+        using type = NullType;
+    };
+
+    template<>
+    struct ScatterHierarchyGetType<NullType, 0> {
+        using type = NullType;
+    };
+
+    template<typename Hierarchy, int index>
+    using ScatterHierarchyGetTypeT = typename ScatterHierarchyGetType<Hierarchy, index>::type;
 
 
+
+    // ScatterHierarchyGet
+    template<int index>
+    auto& ScatterHierarchyGet(auto &hierarchy) {
+        return static_cast<
+                ScatterHierarchyGetTypeT<traits::RemoveReferenceT<decltype(hierarchy)>, index>&
+                >(hierarchy);
+    }
+
+
+
+    // GenLinearHierarchy
+    template<typename List, template<typename, typename> typename Unit>
+    struct GenLinearHierarchy
+            : public Unit<typename List::Head, GenLinearHierarchy<typename List::Tail, Unit>> {
+        using Base = Unit<typename List::Head, GenLinearHierarchy<typename List::Tail, Unit>>;
+    };
+
+    template<template<typename, typename> typename Unit>
+    struct GenLinearHierarchy<type_list::EmptyTypeList, Unit> :
+            public NullType {
+        using Base = NullType;
+    };
+
+
+
+    // LinearHierarchyGetType
+    template<typename Hierarchy, int index>
+    struct LinearHierarchyGetType {
+        using type = typename LinearHierarchyGetType<typename Hierarchy::Base, index - 1>::type;
+    };
+
+    template<typename Hierarchy>
+    struct LinearHierarchyGetType<Hierarchy, 0> {
+        using type = typename Hierarchy::Base;
+    };
+
+    template<int index>
+    struct LinearHierarchyGetType<NullType, index> {
+        using type = NullType;
+    };
+
+    template<>
+    struct LinearHierarchyGetType<NullType, 0> {
+        using type = NullType;
+    };
+
+    template<typename Hierarchy, int index>
+    using LinearHierarchyGetTypeT = typename LinearHierarchyGetType<Hierarchy, index>::type;
+
+
+
+    // LinearHierarchyGet
+    template<int index>
+    auto& LinearHierarchyGet(auto &hierarchy) {
+        return static_cast<
+                LinearHierarchyGetTypeT<traits::RemoveReferenceT<decltype(hierarchy)>, index>&
+                >(hierarchy);
+    }
+
+
+
+    // Simple Units
     template<typename T>
-    struct Unit {
+    struct SimpleScatterUnit {
         T value;
     };
 
+    template<typename T, typename Base>
+    struct SimpleLinearUnit : public Base {
+        T value;
+    };
 } // namespace hierarchy

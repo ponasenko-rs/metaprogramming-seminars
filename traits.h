@@ -1,6 +1,7 @@
 #pragma once
 
 namespace traits {
+    // Convertible
     template<typename From, typename To>
     class Convertible {
         using A = char;
@@ -23,6 +24,8 @@ namespace traits {
     static constexpr bool ConvertibleV = Convertible<T, U>::value;
 
 
+
+    // SameTypes
     template<typename T, typename U>
     struct SameTypes {
         static constexpr bool value = false;
@@ -35,5 +38,26 @@ namespace traits {
 
     template<typename T, typename U>
     static constexpr bool SameTypesV = SameTypes<T, U>::value;
+
+
+
+    // RemoveReference
+    template<typename T>
+    struct RemoveReference {
+        using type = T;
+    };
+
+    template<typename T>
+    struct RemoveReference<T &> {
+        using type = T;
+    };
+
+    template<typename T>
+    struct RemoveReference<T &&> {
+        using type = T;
+    };
+
+    template<typename T>
+    using RemoveReferenceT = typename RemoveReference<T>::type;
 
 } // namespace traits
