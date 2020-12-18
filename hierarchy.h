@@ -118,8 +118,8 @@ namespace hierarchy {
 
 
     // ScatterHierarchyGet
-    template<int index>
-    auto& ScatterHierarchyGet(auto &hierarchy) {
+    template<int index, typename Hierarchy>
+    auto& ScatterHierarchyGet(Hierarchy &hierarchy) {
         return static_cast<
                 ScatterHierarchyGetTypeT<traits::RemoveReferenceT<decltype(hierarchy)>, index>&
                 >(hierarchy);
@@ -169,8 +169,8 @@ namespace hierarchy {
 
 
     // LinearHierarchyGet
-    template<int index>
-    auto& LinearHierarchyGet(auto &hierarchy) {
+    template<int index, typename Hierarchy>
+    auto& LinearHierarchyGet(Hierarchy &hierarchy) {
         return static_cast<
                 LinearHierarchyGetTypeT<traits::RemoveReferenceT<decltype(hierarchy)>, index>&
                 >(hierarchy);
