@@ -149,4 +149,5 @@ template <typename T, typename Base>
 struct SimpleLinearUnit : public Base {
     T value;
 };
+
 }  // namespace hierarchy

@@ -104,4 +104,25 @@ struct Any<head, args...> {
 template <bool... args>
 static constexpr bool AnyV = Any<args...>::value;
 
+template <typename T>
+struct PolymorphicType {
+private:
+    template <typename U>
+    static constexpr bool decide(
+        decltype(dynamic_cast<const volatile void*>(static_cast<U*>(nullptr)))) {
+        return true;
+    }
+
+    template <typename U>
+    static constexpr bool decide(...) {
+        return false;
+    }
+
+public:
+    static constexpr bool value = decide<T>(nullptr);
+};
+
+template <typename T>
+static constexpr bool PolymorphicTypeV = PolymorphicType<T>::value;
+
 }  // namespace traits

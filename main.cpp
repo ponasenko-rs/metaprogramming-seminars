@@ -202,6 +202,22 @@ void testTraits() {
     static_assert(tr::AnyV<true, false, false>);
     static_assert(tr::AnyV<false, true, false>);
     static_assert(!tr::AnyV<false, false, false>);
+
+    // PolymorphicType
+
+    struct Poly {
+        virtual ~Poly() = default;
+    };
+    class PolyDer : public Poly {};
+
+    struct NonPoly {};
+
+    static_assert(!traits::PolymorphicTypeV<int>);
+    static_assert(!traits::PolymorphicTypeV<A>);
+    static_assert(!traits::PolymorphicTypeV<A1>);
+    static_assert(!traits::PolymorphicTypeV<NonPoly>);
+    static_assert(traits::PolymorphicTypeV<Poly>);
+    static_assert(traits::PolymorphicTypeV<PolyDer>);
 }
 
 void testHierarchy() {
