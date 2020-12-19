@@ -56,4 +56,18 @@ struct RemoveReference<T &&> {
 template <typename T>
 using RemoveReferenceT = typename RemoveReference<T>::type;
 
+// Select
+template <bool condition, typename T, typename U>
+struct Select {
+    using type = T;
+};
+
+template <typename T, typename U>
+struct Select<false, T, U> {
+    using type = U;
+};
+
+template <bool condition, typename T, typename U>
+using SelectT = typename Select<condition, T, U>::type;
+
 }  // namespace traits

@@ -177,6 +177,8 @@ void testTraits() {
     static_assert(traits::ConvertibleV<A11, A>);
     static_assert(traits::ConvertibleV<A11, A1>);
     static_assert(!traits::ConvertibleV<A11, A2>);
+
+    // todo: add tests
 }
 
 void testHierarchy() {

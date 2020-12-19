@@ -6,18 +6,6 @@
 namespace hierarchy {
 struct NullType {};
 
-template <bool condition, typename T, typename U>
-struct Select {
-    using type = T;
-};
-
-template <typename T, typename U>
-struct Select<false, T, U> {
-    using type = U;
-};
-
-template <bool condition, typename T, typename U>
-using SelectT = typename Select<condition, T, U>::type;
 
 // MostDerived
 template <typename List, typename T>
@@ -26,7 +14,7 @@ private:
     using Candidate = typename MostDerived<typename List::Tail, T>::type;
 
 public:
-    using type = typename Select<traits::ConvertibleV<typename List::Head, Candidate>,
+    using type = typename traits::Select<traits::ConvertibleV<typename List::Head, Candidate>,
                                  typename List::Head, Candidate>::type;
 };
 
