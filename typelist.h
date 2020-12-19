@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace type_list {
+namespace typelist {
 struct NullType {};
 
 template <typename... Args>
@@ -189,8 +189,7 @@ using RemoveFirstT = typename RemoveFirst<List, T>::type;
 
 // RemoveAll
 template <typename List, typename T>
-struct RemoveAll {
-};
+struct RemoveAll {};
 
 template <typename T, typename... Args>
 struct RemoveAll<TypeList<Args...>, T> {
@@ -233,8 +232,7 @@ using EraseDuplicatesT = typename EraseDuplicates<List>::type;
 
 // ReplaceFirst
 template <typename List, typename T, typename R>
-struct ReplaceFirst {
-};
+struct ReplaceFirst {};
 
 template <typename T, typename R, typename... Args>
 struct ReplaceFirst<TypeList<Args...>, T, R> {
@@ -272,8 +270,7 @@ using ReplaceFirstT = typename ReplaceFirst<List, T, R>::type;
 
 // ReplaceAll
 template <typename List, typename T, typename R>
-struct ReplaceAll {
-};
+struct ReplaceAll {};
 
 template <typename T, typename R, typename... Args>
 struct ReplaceAll<TypeList<Args...>, T, R> {
@@ -309,4 +306,4 @@ struct ReplaceAll<EmptyTypeList, T, R> {
 template <typename List, typename T, typename R>
 using ReplaceAllT = typename ReplaceAll<List, T, R>::type;
 
-}  // namespace type_list
+}  // namespace typelist

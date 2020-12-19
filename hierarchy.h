@@ -6,7 +6,6 @@
 namespace hierarchy {
 struct NullType {};
 
-
 // MostDerived
 template <typename List, typename T>
 struct MostDerived {
@@ -15,11 +14,11 @@ private:
 
 public:
     using type = typename traits::Select<traits::ConvertibleV<typename List::Head, Candidate>,
-                                 typename List::Head, Candidate>::type;
+                                         typename List::Head, Candidate>::type;
 };
 
 template <typename T>
-struct MostDerived<type_list::EmptyTypeList, T> {
+struct MostDerived<typelist::EmptyTypeList, T> {
     using type = T;
 };
 
@@ -33,17 +32,17 @@ private:
     using MostDerivedInTail = typename MostDerived<typename List::Tail, typename List::Head>::type;
 
     using Tail =
-        type_list::ReplaceFirstT<typename List::Tail, MostDerivedInTail, typename List::Head>;
+        typelist::ReplaceFirstT<typename List::Tail, MostDerivedInTail, typename List::Head>;
 
     using Head = MostDerivedInTail;
 
 public:
-    using type = type_list::TypeList<Head, typename DerivedToFront<Tail>::type>;
+    using type = typelist::TypeList<Head, typename DerivedToFront<Tail>::type>;
 };
 
 template <>
-struct DerivedToFront<type_list::EmptyTypeList> {
-    using type = type_list::EmptyTypeList;
+struct DerivedToFront<typelist::EmptyTypeList> {
+    using type = typelist::EmptyTypeList;
 };
 
 template <typename List>
@@ -53,7 +52,7 @@ using DerivedToFrontT = typename DerivedToFront<List>::type;
 template <typename List, template <typename> typename Unit>
 struct GenScatterHierarchy : public GenScatterHierarchy<typename List::Tail, Unit>,
                              public Unit<typename List::Head> {
-    static_assert(type_list::SameListsV<List, type_list::EraseDuplicatesT<List>>,
+    static_assert(typelist::SameListsV<List, typelist::EraseDuplicatesT<List>>,
                   "in scatter hierarchy all types must be unique");
 
     using LeftBase = Unit<typename List::Head>;
@@ -61,7 +60,7 @@ struct GenScatterHierarchy : public GenScatterHierarchy<typename List::Tail, Uni
 };
 
 template <template <typename> typename Unit>
-struct GenScatterHierarchy<type_list::EmptyTypeList, Unit> {
+struct GenScatterHierarchy<typelist::EmptyTypeList, Unit> {
     using LeftBase = NullType;
     using RightBase = NullType;
 };
@@ -105,7 +104,7 @@ struct GenLinearHierarchy
 };
 
 template <template <typename, typename> typename Unit>
-struct GenLinearHierarchy<type_list::EmptyTypeList, Unit> : public NullType {
+struct GenLinearHierarchy<typelist::EmptyTypeList, Unit> : public NullType {
     using Base = NullType;
 };
 

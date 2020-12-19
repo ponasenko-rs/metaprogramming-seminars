@@ -8,7 +8,8 @@
 
 void testTypeList() {
     using traits::SameTypesV;
-    namespace tl = type_list;
+    using typelist::SameListsV;
+    namespace tl = typelist;
 
     using List = tl::TypeList<int, float, bool>;
 
@@ -25,16 +26,16 @@ void testTypeList() {
     static_assert(tl::LengthV<List::Tail::Tail::Tail> == 0);
 
     // SameLists
-    static_assert(tl::SameListsV<tl::EmptyTypeList, tl::EmptyTypeList>);
-    static_assert(tl::SameListsV<List, List>);
-    static_assert(tl::SameListsV<List::Tail, List::Tail>);
-    static_assert(tl::SameListsV<List::Tail::Tail, List::Tail::Tail>);
-    static_assert(tl::SameListsV<List::Tail::Tail::Tail, List::Tail::Tail::Tail>);
+    static_assert(SameListsV<tl::EmptyTypeList, tl::EmptyTypeList>);
+    static_assert(SameListsV<List, List>);
+    static_assert(SameListsV<List::Tail, List::Tail>);
+    static_assert(SameListsV<List::Tail::Tail, List::Tail::Tail>);
+    static_assert(SameListsV<List::Tail::Tail::Tail, List::Tail::Tail::Tail>);
 
-    static_assert(!tl::SameListsV<tl::TypeList<int>, tl::TypeList<float>>);
-    static_assert(!tl::SameListsV<tl::TypeList<int, float>, tl::TypeList<float>>);
-    static_assert(!tl::SameListsV<tl::TypeList<float, int>, tl::TypeList<float>>);
-    static_assert(!tl::SameListsV<tl::EmptyTypeList, tl::TypeList<float>>);
+    static_assert(!SameListsV<tl::TypeList<int>, tl::TypeList<float>>);
+    static_assert(!SameListsV<tl::TypeList<int, float>, tl::TypeList<float>>);
+    static_assert(!SameListsV<tl::TypeList<float, int>, tl::TypeList<float>>);
+    static_assert(!SameListsV<tl::EmptyTypeList, tl::TypeList<float>>);
 
     // At
     static_assert(SameTypesV<tl::AtT<List, 0>, int>);
@@ -50,110 +51,99 @@ void testTypeList() {
     static_assert(tl::IndexOfV<List, double> == -1);
 
     // Add
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 0>, tl::TypeList<double, int, float, bool>>);
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 1>, tl::TypeList<int, double, float, bool>>);
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 2>, tl::TypeList<int, float, double, bool>>);
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 3>, tl::TypeList<int, float, bool, double>>);
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 4>, tl::TypeList<int, float, bool, double>>);
-    static_assert(
-        tl::SameListsV<tl::AddT<List, double, 5>, tl::TypeList<int, float, bool, double>>);
+    static_assert(SameListsV<tl::AddT<List, double, 0>, tl::TypeList<double, int, float, bool>>);
+    static_assert(SameListsV<tl::AddT<List, double, 1>, tl::TypeList<int, double, float, bool>>);
+    static_assert(SameListsV<tl::AddT<List, double, 2>, tl::TypeList<int, float, double, bool>>);
+    static_assert(SameListsV<tl::AddT<List, double, 3>, tl::TypeList<int, float, bool, double>>);
+    static_assert(SameListsV<tl::AddT<List, double, 4>, tl::TypeList<int, float, bool, double>>);
+    static_assert(SameListsV<tl::AddT<List, double, 5>, tl::TypeList<int, float, bool, double>>);
 
     // RemoveFirst
-    static_assert(tl::SameListsV<tl::RemoveFirstT<List, int>, tl::TypeList<float, bool>>);
-    static_assert(tl::SameListsV<tl::RemoveFirstT<List, float>, tl::TypeList<int, bool>>);
-    static_assert(tl::SameListsV<tl::RemoveFirstT<List, bool>, tl::TypeList<int, float>>);
-    static_assert(tl::SameListsV<tl::RemoveFirstT<List, double>, tl::TypeList<int, float, bool>>);
+    static_assert(SameListsV<tl::RemoveFirstT<List, int>, tl::TypeList<float, bool>>);
+    static_assert(SameListsV<tl::RemoveFirstT<List, float>, tl::TypeList<int, bool>>);
+    static_assert(SameListsV<tl::RemoveFirstT<List, bool>, tl::TypeList<int, float>>);
+    static_assert(SameListsV<tl::RemoveFirstT<List, double>, tl::TypeList<int, float, bool>>);
 
-    static_assert(tl::SameListsV<tl::RemoveFirstT<tl::EmptyTypeList, double>, tl::EmptyTypeList>);
+    static_assert(SameListsV<tl::RemoveFirstT<tl::EmptyTypeList, double>, tl::EmptyTypeList>);
     static_assert(
-        tl::SameListsV<
+        SameListsV<
             tl::RemoveFirstT<
                 tl::RemoveFirstT<tl::RemoveFirstT<tl::TypeList<bool, bool, bool>, bool>, bool>,
                 bool>,
             tl::EmptyTypeList>);
-    static_assert(
-        tl::SameListsV<tl::RemoveFirstT<tl::TypeList<bool, int, bool, double, bool>, bool>,
-                       tl::TypeList<int, bool, double, bool>>);
+    static_assert(SameListsV<tl::RemoveFirstT<tl::TypeList<bool, int, bool, double, bool>, bool>,
+                             tl::TypeList<int, bool, double, bool>>);
 
     // RemoveAll
-    static_assert(tl::SameListsV<tl::RemoveAllT<List, int>, tl::TypeList<float, bool>>);
-    static_assert(tl::SameListsV<tl::RemoveAllT<List, float>, tl::TypeList<int, bool>>);
-    static_assert(tl::SameListsV<tl::RemoveAllT<List, bool>, tl::TypeList<int, float>>);
-    static_assert(tl::SameListsV<tl::RemoveAllT<List, double>, tl::TypeList<int, float, bool>>);
+    static_assert(SameListsV<tl::RemoveAllT<List, int>, tl::TypeList<float, bool>>);
+    static_assert(SameListsV<tl::RemoveAllT<List, float>, tl::TypeList<int, bool>>);
+    static_assert(SameListsV<tl::RemoveAllT<List, bool>, tl::TypeList<int, float>>);
+    static_assert(SameListsV<tl::RemoveAllT<List, double>, tl::TypeList<int, float, bool>>);
 
-    static_assert(tl::SameListsV<tl::RemoveAllT<tl::EmptyTypeList, double>, tl::EmptyTypeList>);
+    static_assert(SameListsV<tl::RemoveAllT<tl::EmptyTypeList, double>, tl::EmptyTypeList>);
     static_assert(
-        tl::SameListsV<tl::RemoveAllT<tl::TypeList<bool, bool, bool>, bool>, tl::EmptyTypeList>);
-    static_assert(tl::SameListsV<tl::RemoveAllT<tl::TypeList<bool, int, bool, double, bool>, bool>,
-                                 tl::TypeList<int, double>>);
+        SameListsV<tl::RemoveAllT<tl::TypeList<bool, bool, bool>, bool>, tl::EmptyTypeList>);
+    static_assert(SameListsV<tl::RemoveAllT<tl::TypeList<bool, int, bool, double, bool>, bool>,
+                             tl::TypeList<int, double>>);
 
     // EraseDuplicates
-    static_assert(tl::SameListsV<tl::EraseDuplicatesT<tl::TypeList<int>>, tl::TypeList<int>>);
+    static_assert(SameListsV<tl::EraseDuplicatesT<tl::TypeList<int>>, tl::TypeList<int>>);
 
-    static_assert(tl::SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, int>>, tl::TypeList<int>>);
+    static_assert(SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, int>>, tl::TypeList<int>>);
 
-    static_assert(
-        tl::SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, int, int>>, tl::TypeList<int>>);
+    static_assert(SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, int, int>>, tl::TypeList<int>>);
 
-    static_assert(tl::SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, float, double>>,
-                                 tl::TypeList<int, float, double>>);
+    static_assert(SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, float, double>>,
+                             tl::TypeList<int, float, double>>);
 
-    static_assert(
-        tl::SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, char, int, char, float, float, char,
-                                                         int, double, float, double>>,
-                       tl::TypeList<int, char, float, double>>);
+    static_assert(SameListsV<tl::EraseDuplicatesT<tl::TypeList<int, char, int, char, float, float,
+                                                               char, int, double, float, double>>,
+                             tl::TypeList<int, char, float, double>>);
 
     // ReplaceFirst
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<List, int, double>, tl::TypeList<double, float, bool>>);
+        SameListsV<tl::ReplaceFirstT<List, int, double>, tl::TypeList<double, float, bool>>);
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<List, float, double>, tl::TypeList<int, double, bool>>);
+        SameListsV<tl::ReplaceFirstT<List, float, double>, tl::TypeList<int, double, bool>>);
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<List, bool, double>, tl::TypeList<int, float, double>>);
+        SameListsV<tl::ReplaceFirstT<List, bool, double>, tl::TypeList<int, float, double>>);
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<List, double, char>, tl::TypeList<int, float, bool>>);
+        SameListsV<tl::ReplaceFirstT<List, double, char>, tl::TypeList<int, float, bool>>);
 
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<tl::EmptyTypeList, double, char>, tl::EmptyTypeList>);
+        SameListsV<tl::ReplaceFirstT<tl::EmptyTypeList, double, char>, tl::EmptyTypeList>);
     static_assert(
-        tl::SameListsV<
+        SameListsV<
             tl::ReplaceFirstT<
                 tl::ReplaceFirstT<tl::ReplaceFirstT<tl::TypeList<bool, bool, bool>, bool, double>,
                                   bool, double>,
                 bool, double>,
             tl::TypeList<double, double, double>>);
     static_assert(
-        tl::SameListsV<tl::ReplaceFirstT<tl::TypeList<bool, int, bool, double, bool>, bool, double>,
-                       tl::TypeList<double, int, bool, double, bool>>);
+        SameListsV<tl::ReplaceFirstT<tl::TypeList<bool, int, bool, double, bool>, bool, double>,
+                   tl::TypeList<double, int, bool, double, bool>>);
 
     // ReplaceAll
-    static_assert(
-        tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int>, int, float>, tl::TypeList<float>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int>, int, float>, tl::TypeList<float>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int, int>, int, float>,
-                                 tl::TypeList<float, float>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int, int>, int, float>,
+                             tl::TypeList<float, float>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int, int, int>, int, float>,
-                                 tl::TypeList<float, float, float>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int, int, int>, int, float>,
+                             tl::TypeList<float, float, float>>);
 
-    static_assert(
-        tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int>, float, int>, tl::TypeList<int>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int>, float, int>, tl::TypeList<int>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int, double, int>, int, float>,
-                                 tl::TypeList<float, double, float>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int, double, int>, int, float>,
+                             tl::TypeList<float, double, float>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<double, double, int>, int, float>,
-                                 tl::TypeList<double, double, float>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<double, double, int>, int, float>,
+                             tl::TypeList<double, double, float>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int, double, double>, int, float>,
-                                 tl::TypeList<float, double, double>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int, double, double>, int, float>,
+                             tl::TypeList<float, double, double>>);
 
-    static_assert(tl::SameListsV<tl::ReplaceAllT<tl::TypeList<int>, int, int>, tl::TypeList<int>>);
+    static_assert(SameListsV<tl::ReplaceAllT<tl::TypeList<int>, int, int>, tl::TypeList<int>>);
 }
 
 void testTraits() {
@@ -177,8 +167,8 @@ void testTraits() {
     static_assert(tr::ConvertibleV<int, float>);
     static_assert(tr::ConvertibleV<float, int>);
 
-    static_assert(!tr::ConvertibleV<int, type_list::EmptyTypeList>);
-    static_assert(!tr::ConvertibleV<type_list::EmptyTypeList, int>);
+    static_assert(!tr::ConvertibleV<int, typelist::EmptyTypeList>);
+    static_assert(!tr::ConvertibleV<typelist::EmptyTypeList, int>);
 
     static_assert(tr::ConvertibleV<A1, A>);
     static_assert(!tr::ConvertibleV<A, A1>);
@@ -216,9 +206,10 @@ void testTraits() {
 
 void testHierarchy() {
     using traits::SameTypesV;
+    using typelist::SameListsV;
 
     namespace h = hierarchy;
-    namespace tl = type_list;
+    namespace tl = typelist;
 
     class A {};
     class A1 : public A {};
@@ -244,58 +235,57 @@ void testHierarchy() {
     static_assert(SameTypesV<h::MostDerivedT<tl::TypeList<A11, A1, A>, A>, A11>);
 
     // DerivedToFront
-    static_assert(tl::SameListsV<h::DerivedToFrontT<tl::TypeList<B>>, tl::TypeList<B>>);
+    static_assert(SameListsV<h::DerivedToFrontT<tl::TypeList<B>>, tl::TypeList<B>>);
 
-    static_assert(tl::SameListsV<h::DerivedToFrontT<tl::TypeList<B, B1>>, tl::TypeList<B1, B>>);
+    static_assert(SameListsV<h::DerivedToFrontT<tl::TypeList<B, B1>>, tl::TypeList<B1, B>>);
 
-    static_assert(tl::SameListsV<h::DerivedToFrontT<tl::TypeList<B1, B>>, tl::TypeList<B1, B>>);
+    static_assert(SameListsV<h::DerivedToFrontT<tl::TypeList<B1, B>>, tl::TypeList<B1, B>>);
 
     static_assert(
-        tl::SameListsV<h::DerivedToFrontT<tl::TypeList<B, A, A1, B1>>, tl::TypeList<B1, A1, A, B>>);
+        SameListsV<h::DerivedToFrontT<tl::TypeList<B, A, A1, B1>>, tl::TypeList<B1, A1, A, B>>);
 
-    static_assert(tl::SameListsV<h::DerivedToFrontT<tl::TypeList<B, A1, B2, A, A2, B21, B1>>,
-                                 tl::TypeList<B1, A1, B21, A2, A, B2, B>>);
+    static_assert(SameListsV<h::DerivedToFrontT<tl::TypeList<B, A1, B2, A, A2, B21, B1>>,
+                             tl::TypeList<B1, A1, B21, A2, A, B2, B>>);
 
     // GenScatterHierarchy
     using HierarchyParams = tl::TypeList<int, float, double>;
 
     using ScatterHierarchy = h::GenScatterHierarchy<HierarchyParams, h::SimpleScatterUnit>;
-    static_assert(traits::SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 0>,
-                                     h::SimpleScatterUnit<tl::AtT<HierarchyParams, 0>>>);
+    static_assert(SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 0>,
+                             h::SimpleScatterUnit<tl::AtT<HierarchyParams, 0>>>);
 
-    static_assert(traits::SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 1>,
-                                     h::SimpleScatterUnit<tl::AtT<HierarchyParams, 1>>>);
+    static_assert(SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 1>,
+                             h::SimpleScatterUnit<tl::AtT<HierarchyParams, 1>>>);
 
-    static_assert(traits::SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 2>,
-                                     h::SimpleScatterUnit<tl::AtT<HierarchyParams, 2>>>);
+    static_assert(SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 2>,
+                             h::SimpleScatterUnit<tl::AtT<HierarchyParams, 2>>>);
 
-    static_assert(
-        traits::SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 3>, h::NullType>);
+    static_assert(SameTypesV<h::ScatterHierarchyGetTypeT<ScatterHierarchy, 3>, h::NullType>);
 
     // ScatterHierarchyGet
     ScatterHierarchy sh_obj;
-    static_assert(traits::SameTypesV<decltype(h::ScatterHierarchyGet<0>(sh_obj).value),
-                                     tl::AtT<HierarchyParams, 0>>);
+    static_assert(
+        SameTypesV<decltype(h::ScatterHierarchyGet<0>(sh_obj).value), tl::AtT<HierarchyParams, 0>>);
 
-    static_assert(traits::SameTypesV<decltype(h::ScatterHierarchyGet<1>(sh_obj).value),
-                                     tl::AtT<HierarchyParams, 1>>);
+    static_assert(
+        SameTypesV<decltype(h::ScatterHierarchyGet<1>(sh_obj).value), tl::AtT<HierarchyParams, 1>>);
 
-    static_assert(traits::SameTypesV<decltype(h::ScatterHierarchyGet<2>(sh_obj).value),
-                                     tl::AtT<HierarchyParams, 2>>);
+    static_assert(
+        SameTypesV<decltype(h::ScatterHierarchyGet<2>(sh_obj).value), tl::AtT<HierarchyParams, 2>>);
 
     // LinearHierarchyGet
     using LinearHierarchy = h::GenLinearHierarchy<HierarchyParams, h::SimpleLinearUnit>;
-    static_assert(traits::SameTypesV<h::LinearHierarchyGetTypeT<LinearHierarchy, 3>, h::NullType>);
+    static_assert(SameTypesV<h::LinearHierarchyGetTypeT<LinearHierarchy, 3>, h::NullType>);
 
     LinearHierarchy lh_obj;
-    static_assert(traits::SameTypesV<decltype(h::LinearHierarchyGet<0>(lh_obj).value),
-                                     tl::AtT<HierarchyParams, 0>>);
+    static_assert(
+        SameTypesV<decltype(h::LinearHierarchyGet<0>(lh_obj).value), tl::AtT<HierarchyParams, 0>>);
 
-    static_assert(traits::SameTypesV<decltype(h::LinearHierarchyGet<1>(lh_obj).value),
-                                     tl::AtT<HierarchyParams, 1>>);
+    static_assert(
+        SameTypesV<decltype(h::LinearHierarchyGet<1>(lh_obj).value), tl::AtT<HierarchyParams, 1>>);
 
-    static_assert(traits::SameTypesV<decltype(h::LinearHierarchyGet<2>(lh_obj).value),
-                                     tl::AtT<HierarchyParams, 2>>);
+    static_assert(
+        SameTypesV<decltype(h::LinearHierarchyGet<2>(lh_obj).value), tl::AtT<HierarchyParams, 2>>);
 
     static_assert(sizeof(ScatterHierarchy) == sizeof(LinearHierarchy));
 
@@ -316,59 +306,43 @@ using Expression = typebased::DisjunctionT<
 
 void testTypeBased() {
     // Conditional
+    using traits::SameTypesV;
+    using typebased::FalseType;
+    using typebased::TrueType;
     namespace tb = typebased;
-    namespace tr = traits;
 
-    static_assert(tr::SameTypesV<tb::ConditionalT<tb::TrueType, int, double>, int>);
-    static_assert(tr::SameTypesV<tb::ConditionalT<tb::FalseType, int, double>, double>);
+    // Conditional
+    static_assert(SameTypesV<tb::ConditionalT<tb::TrueType, int, double>, int>);
+    static_assert(SameTypesV<tb::ConditionalT<tb::FalseType, int, double>, double>);
 
     // Conjunction
-    static_assert(
-        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::TrueType, tb::TrueType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::TrueType, tb::TrueType>, tb::FalseType>);
-    static_assert(
-        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::FalseType, tb::TrueType>, tb::FalseType>);
-    static_assert(
-        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::TrueType, tb::FalseType>, tb::FalseType>);
-    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::FalseType, tb::TrueType>,
-                                 tb::FalseType>);
-    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::FalseType, tb::FalseType>,
-                                 tb::FalseType>);
-    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::TrueType, tb::FalseType>,
-                                 tb::FalseType>);
-    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::FalseType, tb::FalseType>,
-                                 tb::FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<TrueType, TrueType, TrueType>, TrueType>);
+    static_assert(SameTypesV<tb::ConjunctionT<FalseType, TrueType, TrueType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<TrueType, FalseType, TrueType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<TrueType, TrueType, FalseType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<FalseType, FalseType, TrueType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<TrueType, FalseType, FalseType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<FalseType, TrueType, FalseType>, FalseType>);
+    static_assert(SameTypesV<tb::ConjunctionT<FalseType, FalseType, FalseType>, FalseType>);
 
     // Disjunction
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::TrueType, tb::TrueType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::TrueType, tb::TrueType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::FalseType, tb::TrueType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::TrueType, tb::FalseType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::FalseType, tb::TrueType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::FalseType, tb::FalseType>, tb::TrueType>);
-    static_assert(
-        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::TrueType, tb::FalseType>, tb::TrueType>);
-    static_assert(tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::FalseType, tb::FalseType>,
-                                 tb::FalseType>);
+    static_assert(SameTypesV<tb::DisjunctionT<TrueType, TrueType, TrueType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<FalseType, TrueType, TrueType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<TrueType, FalseType, TrueType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<TrueType, TrueType, FalseType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<FalseType, FalseType, TrueType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<TrueType, FalseType, FalseType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<FalseType, TrueType, FalseType>, TrueType>);
+    static_assert(SameTypesV<tb::DisjunctionT<FalseType, FalseType, FalseType>, FalseType>);
 
     // Negation
-    static_assert(tr::SameTypesV<tb::TrueType, tb::NegationT<tb::FalseType>>);
-    static_assert(tr::SameTypesV<tb::FalseType, tb::NegationT<tb::TrueType>>);
+    static_assert(SameTypesV<TrueType, tb::NegationT<FalseType>>);
+    static_assert(SameTypesV<FalseType, tb::NegationT<TrueType>>);
 
     // Expression test
-    static_assert(
-        Expression<tb::TrueType, tb::TrueType, tb::FalseType, tb::FalseType, tb::FalseType>::value);
-    static_assert(!Expression<tb::TrueType, tb::FalseType, tb::FalseType, tb::FalseType,
-                              tb::TrueType>::value);
-    static_assert(
-        !Expression<tb::TrueType, tb::FalseType, tb::FalseType, tb::TrueType, tb::TrueType>::value);
+    static_assert(Expression<TrueType, TrueType, FalseType, FalseType, FalseType>::value);
+    static_assert(!Expression<TrueType, FalseType, FalseType, FalseType, TrueType>::value);
+    static_assert(!Expression<TrueType, FalseType, FalseType, TrueType, TrueType>::value);
 }
 
 int main() {
