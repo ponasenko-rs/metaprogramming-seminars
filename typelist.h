@@ -6,12 +6,15 @@ namespace type_list {
 struct NullType {};
 
 template <typename... Args>
-struct TypeList {
-    //        using Head = NullType;
-    //        using Tail = NullType;
-};
+struct TypeList {};
 
 using EmptyTypeList = TypeList<>;
+
+template <typename... Args>
+struct TypeList<TypeList<Args...>> {
+    using Head = typename TypeList<Args...>::Head;
+    using Tail = typename TypeList<Args...>::Tail;
+};
 
 template <typename H, typename... T>
 struct TypeList<H, T...> {
@@ -23,12 +26,6 @@ template <typename H, typename... T>
 struct TypeList<H, TypeList<T...>> {
     using Head = H;
     using Tail = TypeList<T...>;
-};
-
-template <typename H>
-struct TypeList<H> {
-    using Head = H;
-    using Tail = EmptyTypeList;
 };
 
 // Functions

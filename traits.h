@@ -70,4 +70,38 @@ struct Select<false, T, U> {
 template <bool condition, typename T, typename U>
 using SelectT = typename Select<condition, T, U>::type;
 
+// All
+template <bool... args>
+struct All {};
+
+template <>
+struct All<> {
+    static constexpr bool value = true;
+};
+
+template <bool head, bool... args>
+struct All<head, args...> {
+    static constexpr bool value = head && All<args...>::value;
+};
+
+template <bool... args>
+static constexpr bool AllV = All<args...>::value;
+
+// Any
+template <bool... args>
+struct Any {};
+
+template <>
+struct Any<> {
+    static constexpr bool value = false;
+};
+
+template <bool head, bool... args>
+struct Any<head, args...> {
+    static constexpr bool value = head || Any<args...>::value;
+};
+
+template <bool... args>
+static constexpr bool AnyV = Any<args...>::value;
+
 }  // namespace traits

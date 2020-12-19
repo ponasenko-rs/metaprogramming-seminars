@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 
+#include "typebased.h"
 #include "typelist.h"
 #include "traits.h"
 #include "hierarchy.h"
@@ -156,29 +157,61 @@ void testTypeList() {
 }
 
 void testTraits() {
+    namespace tr = traits;
+
     class A {};
     class A1 : public A {};
     class A2 : public A {};
     class A11 : public A1 {};
 
+    // SameTypes
+    static_assert(tr::SameTypesV<int, int>);
+    static_assert(!tr::SameTypesV<int, long>);
+    static_assert(!tr::SameTypesV<long, int>);
+    static_assert(!tr::SameTypesV<int, float>);
+    static_assert(!tr::SameTypesV<int, bool>);
+    static_assert(!tr::SameTypesV<int, char>);
+
     // Convertible
-    static_assert(traits::ConvertibleV<int, int>);
-    static_assert(traits::ConvertibleV<int, float>);
-    static_assert(traits::ConvertibleV<float, int>);
+    static_assert(tr::ConvertibleV<int, int>);
+    static_assert(tr::ConvertibleV<int, float>);
+    static_assert(tr::ConvertibleV<float, int>);
 
-    static_assert(!traits::ConvertibleV<int, type_list::EmptyTypeList>);
-    static_assert(!traits::ConvertibleV<type_list::EmptyTypeList, int>);
+    static_assert(!tr::ConvertibleV<int, type_list::EmptyTypeList>);
+    static_assert(!tr::ConvertibleV<type_list::EmptyTypeList, int>);
 
-    static_assert(traits::ConvertibleV<A1, A>);
-    static_assert(!traits::ConvertibleV<A, A1>);
-    static_assert(traits::ConvertibleV<A2, A>);
-    static_assert(!traits::ConvertibleV<A2, A1>);
+    static_assert(tr::ConvertibleV<A1, A>);
+    static_assert(!tr::ConvertibleV<A, A1>);
+    static_assert(tr::ConvertibleV<A2, A>);
+    static_assert(!tr::ConvertibleV<A2, A1>);
 
-    static_assert(traits::ConvertibleV<A11, A>);
-    static_assert(traits::ConvertibleV<A11, A1>);
-    static_assert(!traits::ConvertibleV<A11, A2>);
+    static_assert(tr::ConvertibleV<A11, A>);
+    static_assert(tr::ConvertibleV<A11, A1>);
+    static_assert(!tr::ConvertibleV<A11, A2>);
 
-    // todo: add tests
+    // Select
+    static_assert(tr::SameTypesV<tr::SelectT<true, int, double>, int>);
+    static_assert(tr::SameTypesV<tr::SelectT<false, int, double>, double>);
+
+    // All
+    static_assert(tr::AllV<true, true, true>);
+    static_assert(!tr::AllV<false, true, true>);
+    static_assert(!tr::AllV<true, false, true>);
+    static_assert(!tr::AllV<true, true, false>);
+    static_assert(!tr::AllV<false, false, true>);
+    static_assert(!tr::AllV<true, false, false>);
+    static_assert(!tr::AllV<false, true, false>);
+    static_assert(!tr::AllV<false, false, false>);
+
+    // Any
+    static_assert(tr::AnyV<true, true, true>);
+    static_assert(tr::AnyV<false, true, true>);
+    static_assert(tr::AnyV<true, false, true>);
+    static_assert(tr::AnyV<true, true, false>);
+    static_assert(tr::AnyV<false, false, true>);
+    static_assert(tr::AnyV<true, false, false>);
+    static_assert(tr::AnyV<false, true, false>);
+    static_assert(!tr::AnyV<false, false, false>);
 }
 
 void testHierarchy() {
@@ -274,9 +307,75 @@ void testHierarchy() {
     assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 2);
 }
 
+template <typename A, typename B, typename C, typename D, typename E>
+using Expression = typebased::DisjunctionT<
+    typebased::ConjunctionT<A, B>, typebased::ConjunctionT<typebased::NegationT<A>, C>,
+    typebased::ConjunctionT<A, D, C>,
+    typebased::ConjunctionT<typebased::NegationT<A>, typebased::NegationT<C>,
+                            typebased::NegationT<E>>>;
+
+void testTypeBased() {
+    // Conditional
+    namespace tb = typebased;
+    namespace tr = traits;
+
+    static_assert(tr::SameTypesV<tb::ConditionalT<tb::TrueType, int, double>, int>);
+    static_assert(tr::SameTypesV<tb::ConditionalT<tb::FalseType, int, double>, double>);
+
+    // Conjunction
+    static_assert(
+        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::TrueType, tb::TrueType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::TrueType, tb::TrueType>, tb::FalseType>);
+    static_assert(
+        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::FalseType, tb::TrueType>, tb::FalseType>);
+    static_assert(
+        tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::TrueType, tb::FalseType>, tb::FalseType>);
+    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::FalseType, tb::TrueType>,
+                                 tb::FalseType>);
+    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::TrueType, tb::FalseType, tb::FalseType>,
+                                 tb::FalseType>);
+    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::TrueType, tb::FalseType>,
+                                 tb::FalseType>);
+    static_assert(tr::SameTypesV<tb::ConjunctionT<tb::FalseType, tb::FalseType, tb::FalseType>,
+                                 tb::FalseType>);
+
+    // Disjunction
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::TrueType, tb::TrueType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::TrueType, tb::TrueType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::FalseType, tb::TrueType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::TrueType, tb::FalseType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::FalseType, tb::TrueType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::TrueType, tb::FalseType, tb::FalseType>, tb::TrueType>);
+    static_assert(
+        tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::TrueType, tb::FalseType>, tb::TrueType>);
+    static_assert(tr::SameTypesV<tb::DisjunctionT<tb::FalseType, tb::FalseType, tb::FalseType>,
+                                 tb::FalseType>);
+
+    // Negation
+    static_assert(tr::SameTypesV<tb::TrueType, tb::NegationT<tb::FalseType>>);
+    static_assert(tr::SameTypesV<tb::FalseType, tb::NegationT<tb::TrueType>>);
+
+    // Expression test
+    static_assert(
+        Expression<tb::TrueType, tb::TrueType, tb::FalseType, tb::FalseType, tb::FalseType>::value);
+    static_assert(!Expression<tb::TrueType, tb::FalseType, tb::FalseType, tb::FalseType,
+                              tb::TrueType>::value);
+    static_assert(
+        !Expression<tb::TrueType, tb::FalseType, tb::FalseType, tb::TrueType, tb::TrueType>::value);
+}
+
 int main() {
-    testTypeList();
     testTraits();
+    testTypeBased();
+
+    testTypeList();
     testHierarchy();
 
     std::cout << "executed" << std::endl;
