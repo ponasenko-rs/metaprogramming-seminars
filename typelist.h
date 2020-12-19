@@ -32,8 +32,11 @@ struct TypeList<H, TypeList<T...>> {
 
 // Length
 template <typename List>
-struct Length {
-    static constexpr int value = 1 + Length<typename List::Tail>::value;
+struct Length {};
+
+template <typename... Args>
+struct Length<TypeList<Args...>> {
+    static constexpr int value = 1 + Length<typename TypeList<Args...>::Tail>::value;
 };
 
 template <>
@@ -46,19 +49,23 @@ static constexpr int LengthV = Length<List>::value;
 
 // At
 template <typename List, int index>
-struct At {
+struct At {};
+
+template <int index, typename... Args>
+struct At<TypeList<Args...>, index> {
     static_assert(index > 0);
-    using type = typename At<typename List::Tail, index - 1>::type;
+    using type = typename At<typename TypeList<Args...>::Tail, index - 1>::type;
 };
 
 template <int index>
 struct At<EmptyTypeList, index> {
+    static_assert(index > 0);
     using type = NullType;
 };
 
-template <typename List>
-struct At<List, 0> {
-    using type = typename List::Head;
+template <typename... Args>
+struct At<TypeList<Args...>, 0> {
+    using type = typename TypeList<Args...>::Head;
 };
 
 template <>
@@ -105,12 +112,15 @@ static constexpr bool SameListsV = SameLists<List1, List2>::value;
 
 // IndexOf
 template <typename List, typename T>
-struct IndexOf {
+struct IndexOf {};
+
+template <typename T, typename... Args>
+struct IndexOf<TypeList<Args...>, T> {
 private:
-    static constexpr int next_value = IndexOf<typename List::Tail, T>::value;
+    static constexpr int tail_value = IndexOf<typename TypeList<Args...>::Tail, T>::value;
 
 public:
-    static constexpr int value = (next_value == -1) ? -1 : 1 + next_value;
+    static constexpr int value = (tail_value == -1) ? -1 : 1 + tail_value;
 };
 
 template <typename T, typename... O>
@@ -128,9 +138,12 @@ static constexpr int IndexOfV = IndexOf<List, T>::value;
 
 // Add
 template <typename List, typename T, int index>
-struct Add {
-    using type =
-        TypeList<typename List::Head, typename Add<typename List::Tail, T, index - 1>::type>;
+struct Add {};
+
+template <typename T, int index, typename... Args>
+struct Add<TypeList<Args...>, T, index> {
+    using type = TypeList<typename TypeList<Args...>::Head,
+                          typename Add<typename TypeList<Args...>::Tail, T, index - 1>::type>;
 };
 
 template <typename T, int index>
@@ -138,9 +151,9 @@ struct Add<EmptyTypeList, T, index> {
     using type = TypeList<T>;
 };
 
-template <typename List, typename T>
-struct Add<List, T, 0> {
-    using type = TypeList<T, List>;
+template <typename T, typename... Args>
+struct Add<TypeList<Args...>, T, 0> {
+    using type = TypeList<T, TypeList<Args...>>;
 };
 
 template <typename T>
@@ -153,8 +166,12 @@ using AddT = typename Add<List, T, index>::type;
 
 // RemoveFirst
 template <typename List, typename T>
-struct RemoveFirst {
-    using type = TypeList<typename List::Head, typename RemoveFirst<typename List::Tail, T>::type>;
+struct RemoveFirst {};
+
+template <typename T, typename... Args>
+struct RemoveFirst<TypeList<Args...>, T> {
+    using type = TypeList<typename TypeList<Args...>::Head,
+                          typename RemoveFirst<typename TypeList<Args...>::Tail, T>::type>;
 };
 
 template <typename T, typename... O>
@@ -173,7 +190,12 @@ using RemoveFirstT = typename RemoveFirst<List, T>::type;
 // RemoveAll
 template <typename List, typename T>
 struct RemoveAll {
-    using type = TypeList<typename List::Head, typename RemoveAll<typename List::Tail, T>::type>;
+};
+
+template <typename T, typename... Args>
+struct RemoveAll<TypeList<Args...>, T> {
+    using type = TypeList<typename TypeList<Args...>::Head,
+                          typename RemoveAll<typename TypeList<Args...>::Tail, T>::type>;
 };
 
 template <typename T, typename... O>
@@ -191,10 +213,14 @@ using RemoveAllT = typename RemoveAll<List, T>::type;
 
 // EraseDuplicates
 template <typename List>
-struct EraseDuplicates {
-    using type = TypeList<typename List::Head,
-                          typename RemoveAll<typename EraseDuplicates<typename List::Tail>::type,
-                                             typename List::Head>::type>;
+struct EraseDuplicates {};
+
+template <typename... Args>
+struct EraseDuplicates<TypeList<Args...>> {
+    using type = TypeList<
+        typename TypeList<Args...>::Head,
+        typename RemoveAll<typename EraseDuplicates<typename TypeList<Args...>::Tail>::type,
+                           typename TypeList<Args...>::Head>::type>;
 };
 
 template <>
@@ -208,13 +234,17 @@ using EraseDuplicatesT = typename EraseDuplicates<List>::type;
 // ReplaceFirst
 template <typename List, typename T, typename R>
 struct ReplaceFirst {
-    using type =
-        TypeList<typename List::Head, typename ReplaceFirst<typename List::Tail, T, R>::type>;
 };
 
-template <typename List, typename T>
-struct ReplaceFirst<List, T, T> {
-    using type = List;
+template <typename T, typename R, typename... Args>
+struct ReplaceFirst<TypeList<Args...>, T, R> {
+    using type = TypeList<typename TypeList<Args...>::Head,
+                          typename ReplaceFirst<typename TypeList<Args...>::Tail, T, R>::type>;
+};
+
+template <typename T, typename... Args>
+struct ReplaceFirst<TypeList<Args...>, T, T> {
+    using type = TypeList<Args...>;
 };
 
 template <typename T, typename... O>
@@ -243,13 +273,17 @@ using ReplaceFirstT = typename ReplaceFirst<List, T, R>::type;
 // ReplaceAll
 template <typename List, typename T, typename R>
 struct ReplaceAll {
-    using type =
-        TypeList<typename List::Head, typename ReplaceAll<typename List::Tail, T, R>::type>;
 };
 
-template <typename List, typename T>
-struct ReplaceAll<List, T, T> {
-    using type = List;
+template <typename T, typename R, typename... Args>
+struct ReplaceAll<TypeList<Args...>, T, R> {
+    using type = TypeList<typename TypeList<Args...>::Head,
+                          typename ReplaceAll<typename TypeList<Args...>::Tail, T, R>::type>;
+};
+
+template <typename T, typename... Args>
+struct ReplaceAll<TypeList<Args...>, T, T> {
+    using type = TypeList<Args...>;
 };
 
 template <typename T, typename... O>
