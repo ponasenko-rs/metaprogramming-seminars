@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cassert>
 
+#include "functor.h"
+#include "hierarchy.h"
 #include "typebased.h"
 #include "typelist.h"
 #include "traits.h"
@@ -311,6 +313,29 @@ void testHierarchy() {
     h::LinearHierarchyGet<2>(lh_with_copies).value = 2;
     assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 1);
     assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 2);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies);
+    h::LinearHierarchyAssign<0>(lh_with_copies, 6);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 6);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies, 7, 8.0);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 7);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 8.0);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies, 9, 10.0, 11);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 10.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 11);
+
+    h::LinearHierarchyAssign<1>(lh_with_copies, 12.0);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 12.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 11);
+
+    h::LinearHierarchyAssign<1>(lh_with_copies, 13.0, 14);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 13.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 14);
 }
 
 template <typename A, typename B, typename C, typename D, typename E>
@@ -361,12 +386,29 @@ void testTypeBased() {
     static_assert(!Expression<TrueType, FalseType, FalseType, TrueType, TrueType>::value);
 }
 
+void testFunctor() {
+    std::function fun = [](int a, int b) {
+      return a + b;
+    };
+
+    functor::Functor<int, int(int, int), int, int> f1(fun, 1, 2);
+    assert(f1() == 3);
+
+    functor::Functor<int, int(int, int), int> f2(fun, 3);
+    assert(f2(4) == 7);
+
+    functor::Functor<int, int(int, int)> f3(fun);
+    assert(f3(5, 6) == 11);
+}
+
 int main() {
     testTraits();
     testTypeBased();
 
     testTypeList();
     testHierarchy();
+
+    testFunctor();
 
     std::cout << "executed" << std::endl;
 
