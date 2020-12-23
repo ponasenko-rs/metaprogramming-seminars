@@ -7,7 +7,6 @@
 #include "typebased.h"
 #include "typelist.h"
 #include "traits.h"
-#include "hierarchy.h"
 
 void testTypeList() {
     using traits::SameTypesV;
@@ -387,6 +386,10 @@ void testTypeBased() {
     static_assert(!Expression<TrueType, FalseType, FalseType, TrueType, TrueType>::value);
 }
 
+std::string function() {
+    return "function";
+}
+
 void testFunctor() {
     std::function fun = [](int a, int b) { return a + b; };
 
@@ -412,6 +415,15 @@ void testFunctor() {
 
     functor::Functor f6(fun2, 1, 2);
     assert(f6(3, 4) == "1 2 3 4");
+
+    functor::Functor f7(function);
+    assert(f7() == "function");
+
+    functor::Functor f8([]() {
+        return std::string("lambda");
+    });
+    assert(f8() == "lambda");
+
 }
 
 int main() {

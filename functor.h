@@ -31,24 +31,25 @@ struct FunctionHolder {
         return function(args...);
     }
 
-    FunctionHolder(std::function<FuncType> function) : function(function) {
+    FunctionHolder(FuncType function) : function(function) {
     }
-    std::function<FuncType> function;
+
+    FuncType function;
 };
 
-template <typename FuncType, typename... Args>
+
+template <typename FunctionType, typename... Args>
 struct Functor {
-    using Func = std::function<FuncType>;
     using Tuple =
         hierarchy::GenLinearHierarchy<typelist::TypeList<Args...>, hierarchy::SimpleLinearUnit>;
 
-    using Result = typename Func::result_type;
+    using Result = traits::GetFunctionResultTypeT<FunctionType>;
 
     Tuple tuple;
     static constexpr int accepted_args_length = typelist::LengthV<typelist::TypeList<Args...>>;
-    FunctionHolder<Result, FuncType> func_holder;
+    FunctionHolder<Result, FunctionType> func_holder;
 
-    Functor(Func func, Args... args) : func_holder(func) {
+    Functor(FunctionType func, Args... args) : func_holder(func) {
         hierarchy::LinearHierarchyAssign<0>(tuple, args...);
     }
 

@@ -109,7 +109,7 @@ struct PolymorphicType {
 private:
     template <typename U>
     static constexpr bool decide(
-        decltype(dynamic_cast<const volatile void*>(static_cast<U*>(nullptr)))) {
+        decltype(dynamic_cast<const volatile void *>(static_cast<U *>(nullptr)))) {
         return true;
     }
 
@@ -124,5 +124,22 @@ public:
 
 template <typename T>
 static constexpr bool PolymorphicTypeV = PolymorphicType<T>::value;
+
+// GetFunctionResultType
+template <typename F>
+struct GetFunctionResultType : public GetFunctionResultType<decltype(&F::operator())> {};
+
+template <typename ClassType, typename ResultType, typename... Args>
+struct GetFunctionResultType<ResultType (ClassType::*)(Args...) const> {
+    using type = ResultType;
+};
+
+template <typename ResultType, typename... Args>
+struct GetFunctionResultType<ResultType (*)(Args...)> {
+    using type = ResultType;
+};
+
+template <typename F>
+using GetFunctionResultTypeT = typename GetFunctionResultType<F>::type;
 
 }  // namespace traits
