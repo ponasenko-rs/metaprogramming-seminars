@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <string>
 
 #include "functor.h"
 #include "hierarchy.h"
@@ -387,18 +388,30 @@ void testTypeBased() {
 }
 
 void testFunctor() {
-    std::function fun = [](int a, int b) {
-      return a + b;
-    };
+    std::function fun = [](int a, int b) { return a + b; };
 
-    functor::Functor<int, int(int, int), int, int> f1(fun, 1, 2);
+    functor::Functor f1(fun, 1, 2);
     assert(f1() == 3);
 
-    functor::Functor<int, int(int, int), int> f2(fun, 3);
+    functor::Functor f2(fun, 3);
     assert(f2(4) == 7);
 
-    functor::Functor<int, int(int, int)> f3(fun);
+    functor::Functor f3(fun);
     assert(f3(5, 6) == 11);
+
+    std::function fun2 = [](int a, int b, int c, int d) {
+        return std::to_string(a) + " " + std::to_string(b) + " " + std::to_string(c) + " " +
+               std::to_string(d);
+    };
+
+    functor::Functor f4(fun2, 1, 2, 3, 4);
+    assert(f4() == "1 2 3 4");
+
+    functor::Functor f5(fun2);
+    assert(f5(1, 2, 3, 4) == "1 2 3 4");
+
+    functor::Functor f6(fun2, 1, 2);
+    assert(f6(3, 4) == "1 2 3 4");
 }
 
 int main() {

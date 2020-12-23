@@ -36,11 +36,13 @@ struct FunctionHolder {
     std::function<FuncType> function;
 };
 
-template <typename Result, typename FuncType, typename... Args>
+template <typename FuncType, typename... Args>
 struct Functor {
     using Func = std::function<FuncType>;
     using Tuple =
         hierarchy::GenLinearHierarchy<typelist::TypeList<Args...>, hierarchy::SimpleLinearUnit>;
+
+    using Result = typename Func::result_type;
 
     Tuple tuple;
     static constexpr int accepted_args_length = typelist::LengthV<typelist::TypeList<Args...>>;
