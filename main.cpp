@@ -1,12 +1,14 @@
-#include <iostream>
+#include <functional>
 #include <cassert>
+#include <iostream>
 #include <string>
 
 #include "functor.h"
 #include "hierarchy.h"
+#include "traits.h"
+#include "tuple.h"
 #include "typebased.h"
 #include "typelist.h"
-#include "traits.h"
 
 void testTypeList() {
     using traits::SameTypesV;
@@ -338,6 +340,35 @@ void testHierarchy() {
     assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 14);
 }
 
+void testTuple() {
+    tuple::Tuple<int, float, double> tuple;
+
+    static_assert(
+        traits::SameTypesV<traits::RemoveReferenceT<decltype(tuple::TupleGet<0>(tuple))>, int>);
+
+    tuple::TupleAssign<0>(tuple, 0);
+    assert(tuple::TupleGet<0>(tuple) == 0);
+
+    tuple::TupleAssign<0>(tuple, 1, 2.0);
+    assert(tuple::TupleGet<0>(tuple) == 1);
+    assert(tuple::TupleGet<1>(tuple) == 2.0);
+
+    tuple::TupleAssign<0>(tuple, 3, 4.0, 5.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 4.0);
+    assert(tuple::TupleGet<2>(tuple) == 5.0);
+
+    tuple::TupleAssign<1>(tuple, 6.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 6.0);
+    assert(tuple::TupleGet<2>(tuple) == 5.0);
+
+    tuple::TupleAssign<1>(tuple, 7.0, 8.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 7.0);
+    assert(tuple::TupleGet<2>(tuple) == 8.0);
+}
+
 template <typename A, typename B, typename C, typename D, typename E>
 using Expression = typebased::DisjunctionT<
     typebased::ConjunctionT<A, B>, typebased::ConjunctionT<typebased::NegationT<A>, C>,
@@ -419,11 +450,8 @@ void testFunctor() {
     functor::Functor f7(function);
     assert(f7() == "function");
 
-    functor::Functor f8([]() {
-        return std::string("lambda");
-    });
+    functor::Functor f8([]() { return std::string("lambda"); });
     assert(f8() == "lambda");
-
 }
 
 int main() {
@@ -432,6 +460,7 @@ int main() {
 
     testTypeList();
     testHierarchy();
+    testTuple();
 
     testFunctor();
 

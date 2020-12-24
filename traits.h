@@ -142,4 +142,16 @@ struct GetFunctionResultType<ResultType (*)(Args...)> {
 template <typename F>
 using GetFunctionResultTypeT = typename GetFunctionResultType<F>::type;
 
+// EnableIf
+template <bool condition, typename T = void>
+struct EnableIf {};
+
+template <typename T>
+struct EnableIf<true, T> {
+    using type = T;
+};
+
+template <bool condition, typename T = void>
+using EnableIfT = typename EnableIf<condition, T>::type;
+
 }  // namespace traits
