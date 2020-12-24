@@ -139,6 +139,17 @@ auto& LinearHierarchyGet(Hierarchy& hierarchy) {
         LinearHierarchyGetTypeT<traits::RemoveReferenceT<decltype(hierarchy)>, index>&>(hierarchy);
 }
 
+// LinearHierarchyAssign
+template <int from_index, typename Hierarchy, typename... Args>
+void LinearHierarchyAssign(Hierarchy& hierarchy, Args... args) {
+}
+
+template <int from_index, typename Hierarchy, typename Arg, typename... Args>
+void LinearHierarchyAssign(Hierarchy& hierarchy, Arg arg, Args... args) {
+    LinearHierarchyGet<from_index>(hierarchy).value = arg;
+    LinearHierarchyAssign<from_index + 1>(hierarchy, args...);
+}
+
 // Simple Units
 template <typename T>
 struct SimpleScatterUnit {

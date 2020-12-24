@@ -1,10 +1,14 @@
-#include <iostream>
+#include <functional>
 #include <cassert>
+#include <iostream>
+#include <string>
 
+#include "functor.h"
+#include "hierarchy.h"
+#include "traits.h"
+#include "tuple.h"
 #include "typebased.h"
 #include "typelist.h"
-#include "traits.h"
-#include "hierarchy.h"
 
 void testTypeList() {
     using traits::SameTypesV;
@@ -311,6 +315,58 @@ void testHierarchy() {
     h::LinearHierarchyGet<2>(lh_with_copies).value = 2;
     assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 1);
     assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 2);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies);
+    h::LinearHierarchyAssign<0>(lh_with_copies, 6);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 6);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies, 7, 8.0);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 7);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 8.0);
+
+    h::LinearHierarchyAssign<0>(lh_with_copies, 9, 10.0, 11);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 10.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 11);
+
+    h::LinearHierarchyAssign<1>(lh_with_copies, 12.0);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 12.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 11);
+
+    h::LinearHierarchyAssign<1>(lh_with_copies, 13.0, 14);
+    assert(h::LinearHierarchyGet<0>(lh_with_copies).value == 9);
+    assert(h::LinearHierarchyGet<1>(lh_with_copies).value == 13.0);
+    assert(h::LinearHierarchyGet<2>(lh_with_copies).value == 14);
+}
+
+void testTuple() {
+    tuple::Tuple<int, float, double> tuple;
+
+    static_assert(
+        traits::SameTypesV<traits::RemoveReferenceT<decltype(tuple::TupleGet<0>(tuple))>, int>);
+
+    tuple::TupleAssign<0>(tuple, 0);
+    assert(tuple::TupleGet<0>(tuple) == 0);
+
+    tuple::TupleAssign<0>(tuple, 1, 2.0);
+    assert(tuple::TupleGet<0>(tuple) == 1);
+    assert(tuple::TupleGet<1>(tuple) == 2.0);
+
+    tuple::TupleAssign<0>(tuple, 3, 4.0, 5.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 4.0);
+    assert(tuple::TupleGet<2>(tuple) == 5.0);
+
+    tuple::TupleAssign<1>(tuple, 6.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 6.0);
+    assert(tuple::TupleGet<2>(tuple) == 5.0);
+
+    tuple::TupleAssign<1>(tuple, 7.0, 8.0);
+    assert(tuple::TupleGet<0>(tuple) == 3);
+    assert(tuple::TupleGet<1>(tuple) == 7.0);
+    assert(tuple::TupleGet<2>(tuple) == 8.0);
 }
 
 template <typename A, typename B, typename C, typename D, typename E>
@@ -361,12 +417,52 @@ void testTypeBased() {
     static_assert(!Expression<TrueType, FalseType, FalseType, TrueType, TrueType>::value);
 }
 
+std::string function() {
+    return "function";
+}
+
+void testFunctor() {
+    std::function fun = [](int a, int b) { return a + b; };
+
+    functor::Functor f1(fun, 1, 2);
+    assert(f1() == 3);
+
+    functor::Functor f2(fun, 3);
+    assert(f2(4) == 7);
+
+    functor::Functor f3(fun);
+    assert(f3(5, 6) == 11);
+
+    std::function fun2 = [](int a, int b, int c, int d) {
+        return std::to_string(a) + " " + std::to_string(b) + " " + std::to_string(c) + " " +
+               std::to_string(d);
+    };
+
+    functor::Functor f4(fun2, 1, 2, 3, 4);
+    assert(f4() == "1 2 3 4");
+
+    functor::Functor f5(fun2);
+    assert(f5(1, 2, 3, 4) == "1 2 3 4");
+
+    functor::Functor f6(fun2, 1, 2);
+    assert(f6(3, 4) == "1 2 3 4");
+
+    functor::Functor f7(function);
+    assert(f7() == "function");
+
+    functor::Functor f8([]() { return std::string("lambda"); });
+    assert(f8() == "lambda");
+}
+
 int main() {
     testTraits();
     testTypeBased();
 
     testTypeList();
     testHierarchy();
+    testTuple();
+
+    testFunctor();
 
     std::cout << "executed" << std::endl;
 
